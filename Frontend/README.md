@@ -1,4 +1,4 @@
-# ⚡ TubeShell Notes Generator (React.js)
+# ⚡ StudyShell Notes Generator (React.js)
 
 A state-of-the-art AI-powered Notes, Mindmaps & Flowchart Web Application built with **React.js + Vite**, featuring descent animations, dark/light theme switcher, progress dashboard, and decoupled backend integration points.
 
@@ -47,13 +47,13 @@ Frontend/
 ├── .env.example                # Backend API URL template
 ├── package.json                # React 18 + Vite dependencies
 ├── vite.config.js              # Vite bundler configuration
-├── index.html                  # HTML entry with TubeShell branding
+├── index.html                  # HTML entry with StudyShell branding
 └── src/
     ├── main.jsx                # React DOM render entry
     ├── App.jsx                 # Main layout & tab router
     ├── index.css               # Design tokens, Dark/Light palettes & descent animations
     ├── assets/
-    │   └── TubeShellLogo.jsx   # Custom TubeShell SVG Brand Logo
+    │   └── StudyShellLogo.jsx   # Custom StudyShell SVG Brand Logo
     ├── services/               # 🌟 BACKEND CONNECTION POINTS
     │   ├── api.js              # Base API client
     │   ├── aiGeneratorService.js # AI URL & YouTube note generation
@@ -62,9 +62,9 @@ Frontend/
     │   ├── ThemeContext.jsx    # Dark & Light mode switcher with persistence
     │   └── NotesContext.jsx    # Central application state & toast notifications
     ├── components/
-    │   ├── Navbar.jsx          # TubeShell Logo, search, tabs, theme toggle
+    │   ├── Navbar.jsx          # StudyShell Logo, search, tabs, theme toggle
     │   ├── UrlGenerator.jsx    # URL/YouTube note generator + 2 preloaded examples
-    │   ├── KeyFeatures.jsx     # "What TubeShell Can Do" feature showcase
+    │   ├── KeyFeatures.jsx     # "What StudyShell Can Do" feature showcase
     │   ├── Dashboard.jsx       # Metrics, activity streak & generation history
     │   ├── NotesGrid.jsx       # Staggered card grid & category filters
     │   ├── NoteCard.jsx        # Markdown notes & interactive checklists

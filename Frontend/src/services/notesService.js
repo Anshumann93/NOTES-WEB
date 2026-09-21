@@ -17,8 +17,8 @@
 import { apiRequest } from './api';
 import { STARTER_NOTES, STARTER_STATS } from '../data/starterData';
 
-const LOCAL_STORAGE_KEY = 'tubeshell_notes_v3';
-const LOCAL_STATS_KEY = 'tubeshell_stats_v3';
+const LOCAL_STORAGE_KEY = 'StudyShell_notes_v3';
+const LOCAL_STATS_KEY = 'StudyShell_stats_v3';
 
 export const NotesService = {
   /**
@@ -43,8 +43,9 @@ export const NotesService = {
 
   /**
    * 🌟 BACKEND HOOK: Save / Create a new note
+   *
    */
-  async saveNote(note) {
+    async saveNote(note) {
     try {
       const created = await apiRequest('/notes', {
         method: 'POST',

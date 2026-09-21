@@ -32,7 +32,7 @@ export default function Dashboard() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tubeshell-notes-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `StudyShell-notes-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('📦 Notes backup exported successfully!', 'success');
@@ -195,7 +195,7 @@ export default function Dashboard() {
                       {note.title}
                     </strong>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      <span>{note.domain || 'TubeShell Notes'}</span>
+                      <span>{note.domain || 'StudyShell Notes'}</span>
                       <span>•</span>
                       <span>{new Date(note.createdAt).toLocaleDateString()}</span>
                       {note.tags?.map(t => (

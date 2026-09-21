@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function TubeShellLogo({ size = 38, showText = true, className = '' }) {
+export default function StudyShellLogo({ size = 38, showText = true, className = '' }) {
   return (
     <div 
-      className={`tubeshell-logo-container ${className}`}
+      className={`StudyShell-logo-container ${className}`}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -68,7 +68,7 @@ export default function TubeShellLogo({ size = 38, showText = true, className = 
                 WebkitTextFillColor: 'transparent'
               }}
             >
-              TubeShell
+              StudyShell
             </span>
             <span
               style={{

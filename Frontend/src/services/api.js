@@ -2,7 +2,7 @@
  * ==========================================================================
  * 🌟 BACKEND CONNECTION POINT: BASE API CLIENT
  * ==========================================================================
- * This module manages all network communications with the TubeShell backend.
+ * This module manages all network communications with the StudyShell backend.
  * 
  * TO CONNECT YOUR BACKEND:
  * 1. Create a `.env` file in the Frontend root.
@@ -30,7 +30,7 @@ export async function apiRequest(endpoint, options = {}) {
   };
 
   // Optional: Attach Auth Token if exists in localStorage
-  const token = localStorage.getItem('tubeshell_auth_token');
+  const token = localStorage.getItem('StudyShell_auth_token');
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
@@ -57,7 +57,7 @@ export async function apiRequest(endpoint, options = {}) {
   } catch (error) {
     // If real backend is offline and fallback is enabled, pass through for mock handling
     if (API_CONFIG.USE_MOCK_FALLBACK) {
-      console.warn(`[TubeShell API] Real backend offline (${url}). Using intelligent client fallback.`, error.message);
+      console.warn(`[StudyShell API] Real backend offline (${url}). Using intelligent client fallback.`, error.message);
       return null; // Signals services to use client generator / localStorage
     }
     throw error;

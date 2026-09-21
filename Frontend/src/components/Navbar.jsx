@@ -1,5 +1,5 @@
 import React from 'react';
-import TubeShellLogo from '../assets/TubeShellLogo';
+import StudyShellLogo from '../assets/StudyShellLogo';
 import { useTheme } from '../context/ThemeContext';
 import { useNotes } from '../context/NotesContext';
 
@@ -35,7 +35,7 @@ export default function Navbar() {
     >
       {/* Brand Logo */}
       <div onClick={() => setActiveTab('generator')}>
-        <TubeShellLogo size={38} />
+        <StudyShellLogo size={38} />
       </div>
 
       {/* Navigation Tabs */}

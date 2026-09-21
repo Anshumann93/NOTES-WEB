@@ -21,7 +21,7 @@ export const AiGeneratorService = {
    * 🌟 BACKEND HOOK: Generate comprehensive notes from a URL or YouTube link
    */
   async generateFromUrl(url, options = {}) {
-    console.log('[TubeShell Generator] Processing URL:', url);
+    console.log('[StudyShell Generator] Processing URL:', url);
 
     // 1. Try real backend first
     try {
@@ -31,7 +31,7 @@ export const AiGeneratorService = {
       });
       if (result) return result;
     } catch (err) {
-      console.warn('[TubeShell Generator] Real backend call failed, using intelligent client synthesis:', err);
+      console.warn('[StudyShell Generator] Real backend call failed, using intelligent client synthesis:', err);
     }
 
     // 2. Intelligent Client-Side Simulation & Fallback
@@ -80,7 +80,7 @@ export const AiGeneratorService = {
       image: isYouTube 
         ? 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=600&q=80'
         : 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
-      content: `## ⚡ AI Generated Analysis for ${domain}\n**Extracted from**: [${url}](${url})\n\n### 💡 Key Insights & Extracted Points\n1. **Core Concept Overview**: Structured synthesis extracted from ${url}.\n2. **Action Items & Steps**: Clear breakdown of key takeaways and actionable checklist items.\n3. **Visual Mapping**: Node relations generated for mindmap and flowchart visualization.\n\n> *Generated automatically by TubeShell Notes Generator AI.*`,
+      content: `## ⚡ AI Generated Analysis for ${domain}\n**Extracted from**: [${url}](${url})\n\n### 💡 Key Insights & Extracted Points\n1. **Core Concept Overview**: Structured synthesis extracted from ${url}.\n2. **Action Items & Steps**: Clear breakdown of key takeaways and actionable checklist items.\n3. **Visual Mapping**: Node relations generated for mindmap and flowchart visualization.\n\n> *Generated automatically by StudyShell Notes Generator AI.*`,
       checklist: [
         { id: "task-1", text: `Review extracted summary for ${domain}`, completed: false },
         { id: "task-2", text: "Inspect interactive mindmap nodes", completed: false },

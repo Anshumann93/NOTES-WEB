@@ -83,7 +83,7 @@ export default function KeyFeatures() {
             letterSpacing: '-0.02em'
           }}
         >
-          What TubeShell Notes Generator Can Do
+          What StudyShell Notes Generator Can Do
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '620px' }}>
           Discover the complete suite of AI-driven synthesis, visual mapping, and productivity tools engineered to supercharge your learning and workflow.

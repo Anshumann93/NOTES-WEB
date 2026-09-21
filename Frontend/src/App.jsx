@@ -10,7 +10,7 @@ import MindmapViewer from './components/MindmapViewer';
 import FlowchartViewer from './components/FlowchartViewer';
 import NoteEditorModal from './components/NoteEditorModal';
 import Toast from './components/Toast';
-import TubeShellLogo from './assets/TubeShellLogo';
+import StudyShellLogo from './assets/StudyShellLogo';
 
 function AppContent() {
   const { activeTab } = useNotes();
@@ -48,9 +48,9 @@ function AppContent() {
           gap: '16px'
         }}
       >
-        <TubeShellLogo size={30} />
+        <StudyShellLogo size={30} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-          <span>TubeShell Notes Generator v1.0.0</span>
+          <span>StudyShell Notes Generator v1.0.0</span>
           <span>•</span>
           <span style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>🌟 Ready for Backend API Integration</span>
         </div>

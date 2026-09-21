@@ -1,17 +1,17 @@
-# Walkthrough: TubeShell Notes Generator (React.js)
+# Walkthrough: StudyShell Notes Generator (React.js)
 
-The **TubeShell Notes Generator** web application has been built from scratch in modern **React.js + Vite** with modular architecture, descent animations, dark/light theme switching, and easy-to-recognize backend connection points.
+The **StudyShell Notes Generator** web application has been built from scratch in modern **React.js + Vite** with modular architecture, descent animations, dark/light theme switching, and easy-to-recognize backend connection points.
 
 ---
 
 ## 🌟 Key Features Implemented
 
-### 1. TubeShell Brand Identity & Dual Theme
-- **Custom TubeShell Logo** ([TubeShellLogo.jsx](file:///c:/Users/ASUS/OneDrive/Desktop/NOTES%20APP/Frontend/src/assets/TubeShellLogo.jsx)): Responsive glowing SVG shell/lightning icon with branding across the navigation bar, dashboard, and footer.
+### 1. StudyShell Brand Identity & Dual Theme
+- **Custom StudyShell Logo** ([StudyShellLogo.jsx](file:///c:/Users/ASUS/OneDrive/Desktop/NOTES%20APP/Frontend/src/assets/StudyShellLogo.jsx)): Responsive glowing SVG shell/lightning icon with branding across the navigation bar, dashboard, and footer.
 - **Theme Switcher** ([ThemeContext.jsx](file:///c:/Users/ASUS/OneDrive/Desktop/NOTES%20APP/Frontend/src/context/ThemeContext.jsx)): Fluid animated toggle between **Dark Mode** (Obsidian Glass `#080c14`) and **Light Mode** (Porcelain White `#f4f6fb`) with persistent `localStorage` memory.
 - **Descent Animations** ([index.css](file:///c:/Users/ASUS/OneDrive/Desktop/NOTES%20APP/Frontend/src/index.css)): Staggered downward cascade physics (`@keyframes cardDescentIn`, `@keyframes descentFadeIn`, `@keyframes modalDropIn`).
 
-### 2. "What TubeShell Can Do" Key Features Showcase
+### 2. "What StudyShell Can Do" Key Features Showcase
 - [KeyFeatures.jsx](file:///c:/Users/ASUS/OneDrive/Desktop/NOTES%20APP/Frontend/src/components/KeyFeatures.jsx) displays interactive feature cards highlighting:
   - 🎥 **YouTube & Video Summarizer**
   - 🧠 **AI Mindmap Generator**

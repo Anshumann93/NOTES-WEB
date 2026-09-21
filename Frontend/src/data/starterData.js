@@ -1,5 +1,5 @@
 /**
- * STARTER DATA & PRELOADED EXAMPLES FOR TUBESHELL
+ * STARTER DATA & PRELOADED EXAMPLES FOR StudyShell
  */
 
 export const PRELOADED_URL_EXAMPLES = [
@@ -158,14 +158,14 @@ export const STARTER_NOTES = [
     id: "note-idea-3",
     type: "note",
     sourceType: "custom",
-    title: "💡 TubeShell AI Generation Features & Vision",
+    title: "💡 StudyShell AI Generation Features & Vision",
     content: "- **YouTube Transcript OCR**: Parse audio transcripts and key slide frames into actionable markdown.\n- **Mindmap Branch Synthesizer**: Automatically structure hierarchic concepts into interactive nodes.\n- **Workflow Flowchart Synthesis**: Turn step-by-step logic into visual signal pathways.\n- **Local-First & Offline First**: Zero latency with seamless cloud sync backend integration.",
     category: "ideas",
     color: "purple",
     isPinned: false,
     isArchived: false,
     isTrash: false,
-    tags: ["TubeShell", "ProductVision", "AI", "Mindmaps"],
+    tags: ["StudyShell", "ProductVision", "AI", "Mindmaps"],
     createdAt: new Date(Date.now() - 3600000 * 18).toISOString(),
     updatedAt: new Date(Date.now() - 3600000 * 12).toISOString()
   }

@@ -4,13 +4,13 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('tubeshell_theme') || 'dark';
+    return localStorage.getItem('StudyShell_theme') || 'dark';
   });
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.className = `${theme}-mode`;
-    localStorage.setItem('tubeshell_theme', theme);
+    localStorage.setItem('StudyShell_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {

@@ -6,7 +6,7 @@ export default function UrlGenerator() {
   const { generateFromUrl, isGenerating, generationProgress, setActiveTab, setActiveNoteForViewer, notes } = useNotes();
   const [inputUrl, setInputUrl] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e)   => {
     e.preventDefault();
     if (!inputUrl.trim()) return;
     generateFromUrl(inputUrl);
