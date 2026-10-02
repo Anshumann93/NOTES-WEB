@@ -37,7 +37,7 @@ export function NotesProvider({ children }) {
     setLoading(true);
     try {
       const data = await NotesService.getNotes();
-      setNotes(data);
+      setNotes(data.notes || []);
     } catch (err) {
       console.error('Failed to load notes', err);
     } finally {
@@ -48,6 +48,38 @@ export function NotesProvider({ children }) {
   useEffect(() => {
     loadNotes();
   }, []);
+
+  // Modular background polling for processing notes (easy to swap with WebSockets/SSE later)
+  useEffect(() => {
+    const processingNotes = notes.filter(n => n.status === 'pending' || n.status === 'processing');
+    if (processingNotes.length === 0) return;
+
+    const timer = setInterval(async () => {
+      let stateChanged = false;
+      for (const pNote of processingNotes) {
+        try {
+          const statusResult = await NotesService.getNoteStatus(pNote.id);
+          if (statusResult.status === 'completed' || statusResult.status === 'failed') {
+            stateChanged = true;
+            if (statusResult.status === 'completed') {
+              showToast(`Generation completed for: ${statusResult.title || 'Note'}`, 'success');
+            } else {
+              showToast(`Generation failed for: ${statusResult.title || 'Note'}`, 'warn');
+            }
+          }
+        } catch (err) {
+          console.error('Polling error:', err);
+        }
+      }
+      
+      // If any note finished processing, seamlessly refresh the full list without reloading the page
+      if (stateChanged) {
+        loadNotes();
+      }
+    }, 2500);
+
+    return () => clearInterval(timer);
+  }, [notes]);
 
   const saveNote = async (noteData) => {
     try {
@@ -91,22 +123,20 @@ export function NotesProvider({ children }) {
     }
 
     setIsGenerating(true);
-    setGenerationProgress({ step: 1, text: 'Fetching transcript & metadata...' });
+    setGenerationProgress({ step: 1, text: 'Sending to AI Generation Pipeline...' });
 
     try {
-      await new Promise(r => setTimeout(r, 600));
-      setGenerationProgress({ step: 2, text: 'Analyzing key concepts & structuring markdown...' });
-
-      await new Promise(r => setTimeout(r, 700));
-      setGenerationProgress({ step: 3, text: 'Generating interactive Mindmap and Flowchart nodes...' });
-
-      const generatedNote = await AiGeneratorService.generateFromUrl(url);
-      await saveNote(generatedNote);
-      setActiveNoteForViewer(generatedNote);
-      showToast('⚡ Note, Mindmap & Flowchart generated successfully!', 'success');
+      // 1. Trigger the async job on the backend
+      await AiGeneratorService.generateFromUrl(url);
+      
+      // 2. Refresh notes to immediately show the 'processing' skeleton in the UI
+      await loadNotes();
+      
+      showToast('Generation started in the background. You can safely navigate away.', 'info');
       setActiveTab('notes');
     } catch (err) {
-      showToast('Generation failed. Please check URL.', 'warn');
+      console.error(err);
+      showToast(err.message || 'Generation failed to start.', 'warn');
     } finally {
       setIsGenerating(false);
       setGenerationProgress({ step: 0, text: '' });

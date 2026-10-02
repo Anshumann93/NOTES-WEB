@@ -1,25 +1,9 @@
-/**
- * ==========================================================================
- * 🌟 BACKEND CONNECTION POINT: BASE API CLIENT
- * ==========================================================================
- * This module manages all network communications with the StudyShell backend.
- * 
- * TO CONNECT YOUR BACKEND:
- * 1. Create a `.env` file in the Frontend root.
- * 2. Set: `VITE_API_BASE_URL=http://your-backend-host:port/api`
- * 3. Toggle `USE_MOCK_FALLBACK = false` below once your backend server is live.
- * ==========================================================================
- */
-
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   TIMEOUT_MS: 30000,
-  USE_MOCK_FALLBACK: true // Set to false when your real backend is fully running
+  USE_MOCK_FALLBACK: false
 };
 
-/**
- * Universal API Request Wrapper with error handling & token auth support
- */
 export async function apiRequest(endpoint, options = {}) {
   const url = `${API_CONFIG.BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   
@@ -29,15 +13,10 @@ export async function apiRequest(endpoint, options = {}) {
     ...(options.headers || {})
   };
 
-  // Optional: Attach Auth Token if exists in localStorage
-  const token = localStorage.getItem('StudyShell_auth_token');
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   const config = {
     ...options,
-    headers
+    headers,
+    credentials: 'include' // Crucial for HTTP-only cookies (refresh token)
   };
 
   try {
@@ -48,18 +27,16 @@ export async function apiRequest(endpoint, options = {}) {
     const response = await fetch(url, config);
     clearTimeout(timeoutId);
 
+    const data = await response.json().catch(() => null);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: response.statusText }));
-      throw new Error(errorData.message || `HTTP Error ${response.status}`);
+      const errorMsg = data?.message || `HTTP Error ${response.status}`;
+      throw new Error(errorMsg);
     }
 
-    return await response.json();
+    // Backend standardized on { success, data, message }
+    return data?.data !== undefined ? data.data : data;
   } catch (error) {
-    // If real backend is offline and fallback is enabled, pass through for mock handling
-    if (API_CONFIG.USE_MOCK_FALLBACK) {
-      console.warn(`[StudyShell API] Real backend offline (${url}). Using intelligent client fallback.`, error.message);
-      return null; // Signals services to use client generator / localStorage
-    }
     throw error;
   }
 }

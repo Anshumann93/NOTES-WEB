@@ -2,10 +2,12 @@ import React from 'react';
 import StudyShellLogo from '../assets/StudyShellLogo';
 import { useTheme } from '../context/ThemeContext';
 import { useNotes } from '../context/NotesContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { activeTab, setActiveTab, setIsModalOpen, setEditingNote, searchQuery, setSearchQuery } = useNotes();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { id: 'generator', label: '⚡ URL Generator', badge: 'AI' },
@@ -156,6 +158,19 @@ export default function Navbar() {
           <span>+</span>
           <span>New Note</span>
         </button>
+
+        {/* User Profile / Logout */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderLeft: '1px solid var(--border-medium)', paddingLeft: '12px' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{user?.name}</span>
+          <button 
+            className="btn-secondary" 
+            onClick={logout}
+            title="Logout"
+            style={{ padding: '6px', fontSize: '1rem', height: '36px', width: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            🚪
+          </button>
+        </div>
       </div>
     </header>
   );

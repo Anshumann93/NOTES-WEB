@@ -1,6 +1,8 @@
 import React from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { NotesProvider, useNotes } from './context/NotesContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Auth from './components/Auth';
 import Navbar from './components/Navbar';
 import UrlGenerator from './components/UrlGenerator';
 import Dashboard from './components/Dashboard';
@@ -14,6 +16,15 @@ import StudyShellLogo from './assets/StudyShellLogo';
 
 function AppContent() {
   const { activeTab } = useNotes();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Auth />;
+  }
 
   return (
     <div className="app-layout">
@@ -62,9 +73,11 @@ function AppContent() {
 export default function App() {
   return (
     <ThemeProvider>
-      <NotesProvider>
-        <AppContent />
-      </NotesProvider>
+      <AuthProvider>
+        <NotesProvider>
+          <AppContent />
+        </NotesProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
