@@ -46,8 +46,12 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const guestLogin = () => {
+    setUser({ _id: 'demo_user_123', name: 'Demo User', email: 'demo@studyshell.app' });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, guestLogin }}>
       {children}
     </AuthContext.Provider>
   );

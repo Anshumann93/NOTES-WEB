@@ -84,7 +84,7 @@ class NoteService {
   }
 
   async getNoteStatus(noteId, userId) {
-    const note = await Note.findOne({ _id: noteId, user: userId }).select('status error title _id');
+    const note = await Note.findOne({ _id: noteId, user: userId }).select('status error title _id progressStep progressText');
     if (!note) {
       throw new ApiError(404, 'Note not found or unauthorized');
     }
@@ -92,7 +92,9 @@ class NoteService {
       id: note._id,
       status: note.status,
       error: note.error,
-      title: note.title
+      title: note.title,
+      progressStep: note.progressStep || 0,
+      progressText: note.progressText || ''
     };
   }
 }

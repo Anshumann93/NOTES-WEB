@@ -6,10 +6,10 @@ const generatorQueue = new Queue('generatorQueue', { connection });
 /**
  * Enqueues a note generation job
  */
-const addGenerationJob = async (noteId, url, userId) => {
+const addGenerationJob = async (noteId, url, userId, options = {}) => {
   return await generatorQueue.add(
     'generate-study-material',
-    { noteId, url, userId },
+    { noteId, url, userId, options },
     {
       attempts: 3,
       backoff: {

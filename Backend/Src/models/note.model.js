@@ -61,6 +61,9 @@ const noteSchema = new mongoose.Schema(
     mindMap: { type: mongoose.Schema.Types.Mixed }, // Standard requested mindmap format
     mindmapData: { type: mongoose.Schema.Types.Mixed }, // Frontend expected mindmap schema
     flowchartData: { type: mongoose.Schema.Types.Mixed }, // Frontend expected flowchart schema
+    handwrittenData: { type: mongoose.Schema.Types.Mixed }, // Structured pages for handwritten notebook view
+    noteStyle: { type: String, enum: ['standard', 'handwritten'], default: 'standard' },
+    generationOptions: { type: mongoose.Schema.Types.Mixed },
 
     // Processing & State
     status: {
@@ -69,6 +72,8 @@ const noteSchema = new mongoose.Schema(
       default: 'completed',
       index: true
     },
+    progressStep: { type: Number, default: 0 },
+    progressText: { type: String, default: '' },
     error: { type: String }, // Populated if status is 'failed'
     
     // UI states

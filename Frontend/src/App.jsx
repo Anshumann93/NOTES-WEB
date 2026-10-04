@@ -12,10 +12,11 @@ import MindmapViewer from './components/MindmapViewer';
 import FlowchartViewer from './components/FlowchartViewer';
 import NoteEditorModal from './components/NoteEditorModal';
 import Toast from './components/Toast';
+import HandwrittenNotesViewer from './components/HandwrittenNotesViewer';
 import StudyShellLogo from './assets/StudyShellLogo';
 
 function AppContent() {
-  const { activeTab } = useNotes();
+  const { activeTab, activeNoteForViewer, setActiveNoteForViewer } = useNotes();
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -25,6 +26,8 @@ function AppContent() {
   if (!user) {
     return <Auth />;
   }
+
+  const isMindmapOrFlowchart = activeTab === 'mindmap' || activeTab === 'flowchart';
 
   return (
     <div className="app-layout">
@@ -40,6 +43,14 @@ function AppContent() {
         {activeTab === 'mindmap' && <MindmapViewer />}
         {activeTab === 'flowchart' && <FlowchartViewer />}
       </main>
+
+      {/* Handwritten Notebook Overlay Modal */}
+      {activeNoteForViewer && !isMindmapOrFlowchart && (
+        <HandwrittenNotesViewer
+          note={activeNoteForViewer}
+          onClose={() => setActiveNoteForViewer(null)}
+        />
+      )}
 
       {/* Modal Dialog & Toast */}
       <NoteEditorModal />

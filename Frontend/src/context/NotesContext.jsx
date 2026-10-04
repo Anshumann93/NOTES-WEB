@@ -116,27 +116,53 @@ export function NotesProvider({ children }) {
   };
 
   // Trigger AI generation from a URL
-  const generateFromUrl = async (url) => {
+  const generateFromUrl = async (url, options = {}) => {
     if (!url || !url.trim()) {
-      showToast('Please enter or paste a valid URL', 'warn');
+      showToast('Please enter or paste a valid YouTube URL', 'warn');
       return;
     }
 
     setIsGenerating(true);
-    setGenerationProgress({ step: 1, text: 'Sending to AI Generation Pipeline...' });
+    setGenerationProgress({ step: 1, text: 'Validating YouTube URL & transcript...' });
 
     try {
-      // 1. Trigger the async job on the backend
-      await AiGeneratorService.generateFromUrl(url);
+      // 1. Trigger the job on backend
+      const result = await AiGeneratorService.generateFromUrl(url, options);
+      const pendingNoteId = result._id || result.id;
       
-      // 2. Refresh notes to immediately show the 'processing' skeleton in the UI
+      // 2. Refresh notes list to show pending note card
       await loadNotes();
       
-      showToast('Generation started in the background. You can safely navigate away.', 'info');
-      setActiveTab('notes');
+      showToast('Extracting transcript and generating notes...', 'info');
+
+      // 3. Poll for progress and completion
+      if (pendingNoteId) {
+        const completedNote = await AiGeneratorService.pollGenerationStatus(
+          pendingNoteId,
+          2000,
+          90,
+          (statusUpdate) => {
+            if (statusUpdate?.progressText) {
+              setGenerationProgress({
+                step: statusUpdate.progressStep || 2,
+                text: statusUpdate.progressText
+              });
+            }
+          }
+        );
+
+        await loadNotes();
+        showToast(`Notes generated successfully: ${completedNote.title}`, 'success');
+
+        // Automatically open handwritten notebook viewer if generated in handwritten style
+        if (completedNote.noteStyle === 'handwritten' || options.noteStyle === 'handwritten') {
+          setActiveNoteForViewer(completedNote);
+        }
+      }
     } catch (err) {
-      console.error(err);
+      console.error('[NotesContext] Generation error:', err);
       showToast(err.message || 'Generation failed to start.', 'warn');
+      await loadNotes();
     } finally {
       setIsGenerating(false);
       setGenerationProgress({ step: 0, text: '' });

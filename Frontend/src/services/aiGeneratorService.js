@@ -16,7 +16,7 @@ export const AiGeneratorService = {
   /**
    * Polls the backend for processing status
    */
-  async pollGenerationStatus(noteId, interval = 2000, maxAttempts = 60) {
+  async pollGenerationStatus(noteId, interval = 2000, maxAttempts = 90, onProgress = null) {
     let attempts = 0;
     
     return new Promise((resolve, reject) => {
@@ -25,10 +25,13 @@ export const AiGeneratorService = {
         try {
           const statusResult = await apiRequest(`/notes/${noteId}/status`);
           const status = statusResult?.status;
+
+          if (onProgress && typeof onProgress === 'function') {
+            onProgress(statusResult);
+          }
           
           if (status === 'completed') {
             clearInterval(timer);
-            // Fetch the completed full note
             const completeNote = await apiRequest(`/notes/${noteId}`);
             resolve(completeNote);
           } else if (status === 'failed') {
@@ -36,7 +39,7 @@ export const AiGeneratorService = {
             reject(new Error(statusResult?.error || 'Generation failed'));
           } else if (attempts >= maxAttempts) {
             clearInterval(timer);
-            reject(new Error('Generation timeout'));
+            reject(new Error('Generation process timed out. Please try again.'));
           }
         } catch (err) {
           clearInterval(timer);

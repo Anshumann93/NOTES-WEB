@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+
 
 function Logo() {
   return (
@@ -60,7 +61,7 @@ function AuthInput({ type, placeholder, value, onChange, icon, required }) {
 }
 
 export default function Auth() {
-  const { login, register } = useAuth();
+  const { login, register, guestLogin } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -101,7 +102,7 @@ export default function Auth() {
     }
   };
 
-  const pills = ["🤖 AI Notes", "🧠 Mind Maps", "🔗 URL → Notes", "📊 Flowcharts"];
+  const pills = ["✍️ Handwritten Notes", "🤖 AI Transcriber", "🧠 Mind Maps", "🔗 YouTube → Notes", "📊 Flowcharts"];
 
   return (
     <>
@@ -378,12 +379,36 @@ export default function Auth() {
               }
             />
 
-            <div style={{ marginTop: "6px" }}>
+            <div style={{ marginTop: "6px", display: "flex", flexDirection: "column", gap: "10px" }}>
               <button type="submit" className="auth-btn" disabled={isLoading}>
                 {isLoading
                   ? <><span className="auth-spinner" />{isLogin ? "Signing In..." : "Creating Account..."}</>
                   : (isLogin ? "→  Sign In" : "→  Create Account")
                 }
+              </button>
+
+              <button
+                type="button"
+                onClick={guestLogin}
+                style={{
+                  width: "100%",
+                  height: "44px",
+                  borderRadius: "14px",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  background: "rgba(255,255,255,0.06)",
+                  color: "#f8fafc",
+                  fontSize: "0.88rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <span>⚡</span>
+                <span>Instant Demo Access (Skip Login)</span>
               </button>
             </div>
           </form>

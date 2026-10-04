@@ -55,75 +55,36 @@ export const STARTER_NOTES = [
     domain: "youtube.com",
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=600&q=80",
     content: "## 📺 YouTube Video Summary: System Architecture\n**Channel**: TechSummit Global | **Duration**: 42:15\n\n### 💡 Key Takeaways\n1. **Event-Driven Decoupling**: Isolate heavy transactional databases from read-heavy consumer feeds using Kafka/RabbitMQ.\n2. **Saga Pattern**: Manage distributed multi-service operations without locking table records across services.\n3. **Circuit Breakers**: Implement automatic fallbacks with 500ms trip threshold to prevent cascading cluster outages.\n\n```typescript\n// Circuit breaker retry wrapper\nasync function executeWithFallback<T>(fn: () => Promise<T>, fallback: T): Promise<T> {\n  try {\n    return await fn();\n  } catch (err) {\n    console.warn('Circuit tripped, executing fallback', err);\n    return fallback;\n  }\n}\n```",
-    category: "work",
-    color: "indigo",
-    isPinned: true,
-    isArchived: false,
-    isTrash: false,
-    tags: ["YouTube", "Architecture", "Microservices", "SystemDesign"],
-    mindmapData: {
-      id: "mm-system-architecture",
-      title: "⚡ Scalable Microservices Architecture",
-      color: "indigo",
-      x: 380,
-      y: 240,
-      children: [
+    noteStyle: "handwritten",
+    handwrittenData: {
+      notebookTitle: "⚡ System Architecture & Scalable Microservices",
+      pages: [
         {
-          id: "mm-sa-1",
-          title: "📨 Event Streaming",
-          color: "purple",
-          x: 140,
-          y: 120,
-          expanded: true,
-          children: [
-            { id: "mm-sa-1-1", title: "Kafka Event Log", color: "purple", x: 40, y: 80 },
-            { id: "mm-sa-1-2", title: "RabbitMQ Dead Letter", color: "purple", x: 40, y: 150 }
+          pageNumber: 1,
+          header: "Module 1: System Architecture & Decoupling",
+          sections: [
+            { type: "heading", title: "1. Core Microservices Principles" },
+            { type: "paragraph", content: "Modern distributed systems rely on asynchronous event streaming to decouple heavy transactional databases from read-heavy consumer feeds using message brokers." },
+            { type: "definition", term: "Saga Pattern", definition: "Manages distributed multi-service transactions without holding table locks across distinct microservices.", highlight: "yellow" },
+            { type: "bullets", title: "Key Takeaways", items: [
+              "Event-Driven Decoupling via Kafka & RabbitMQ",
+              "Distributed transactions managed via Sagas",
+              "Automatic circuit breakers with 500ms trip threshold"
+            ] },
+            { type: "formula", title: "Circuit Breaker Resiliency Threshold", content: "SLA Goal = 99.99% | Trip Threshold = 500ms | Backoff = 2^n * 100ms", highlight: "pink" }
           ]
         },
         {
-          id: "mm-sa-2",
-          title: "🛡️ Resiliency & Fallbacks",
-          color: "cyan",
-          x: 640,
-          y: 120,
-          expanded: true,
-          children: [
-            { id: "mm-sa-2-1", title: "Circuit Breakers (500ms)", color: "cyan", x: 800, y: 80 },
-            { id: "mm-sa-2-2", title: "Distributed Sagas", color: "cyan", x: 800, y: 150 }
-          ]
-        },
-        {
-          id: "mm-sa-3",
-          title: "📊 Observability & Metrics",
-          color: "emerald",
-          x: 380,
-          y: 400,
-          expanded: true,
-          children: [
-            { id: "mm-sa-3-1", title: "OpenTelemetry Traces", color: "emerald", x: 200, y: 460 },
-            { id: "mm-sa-3-2", title: "Prometheus 99.99% SLA", color: "emerald", x: 540, y: 460 }
+          pageNumber: 2,
+          header: "Module 2: Event Pipeline & Retry Logic",
+          sections: [
+            { type: "heading", title: "2. Signal Pathway Flow Diagram" },
+            { type: "diagram", title: "Event Processing & Dead-Letter Queue Pipeline", diagramType: "process", items: [
+              "User Request", "API Gateway", "Kafka Event Bus", "Consumer Health Check", "Postgres Write & Redis Cache"
+            ] },
+            { type: "example", title: "Fault Tolerant Fallback Logic", content: "async function executeWithFallback<T>(fn: () => Promise<T>, fallback: T): Promise<T> { try { return await fn(); } catch (err) { return fallback; } }", highlight: "green" }
           ]
         }
-      ]
-    },
-    flowchartData: {
-      id: "flow-microservices-sync",
-      title: "Microservices Event Processing & Resiliency Flow",
-      nodes: [
-        { id: "fn-1", step: "Step 1", title: "User Request Dispatched", type: "terminal", x: 40, y: 100, desc: "API Gateway validates JWT token" },
-        { id: "fn-2", step: "Step 2", title: "Event Published to Bus", type: "process", x: 260, y: 100, desc: "Serialized JSON payload to Kafka cluster" },
-        { id: "fn-3", step: "Step 3", title: "Consumer Healthy?", type: "decision", x: 480, y: 90, desc: "Health check & heartbeat response < 200ms" },
-        { id: "fn-4", step: "Step 3b", title: "Route to Dead Letter Queue", type: "process", x: 480, y: 260, desc: "Alert DevOps and retry after backoff" },
-        { id: "fn-5", step: "Step 4", title: "Database Write & Cache", type: "process", x: 720, y: 100, desc: "Postgres write + Redis cache invalidation" },
-        { id: "fn-6", step: "Step 5", title: "Ack Confirmed (200 OK)", type: "success", x: 940, y: 100, desc: "Response sent back to client" }
-      ],
-      connections: [
-        { from: "fn-1", to: "fn-2", label: "Route" },
-        { from: "fn-2", to: "fn-3", label: "Publish" },
-        { from: "fn-3", to: "fn-5", label: "Healthy (Yes)" },
-        { from: "fn-3", to: "fn-4", label: "Timeout (No)" },
-        { from: "fn-4", to: "fn-5", label: "On Auto-Retry" },
-        { from: "fn-5", to: "fn-6", label: "Success" }
       ]
     },
     createdAt: new Date(Date.now() - 3600000 * 3).toISOString(),

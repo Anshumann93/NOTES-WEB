@@ -3,18 +3,38 @@ import { useNotes } from '../context/NotesContext';
 import { PRELOADED_URL_EXAMPLES } from '../data/starterData';
 
 export default function UrlGenerator() {
-  const { generateFromUrl, isGenerating, generationProgress, setActiveTab, setActiveNoteForViewer, notes } = useNotes();
+  const { generateFromUrl, isGenerating, generationProgress } = useNotes();
   const [inputUrl, setInputUrl] = useState('');
+  
+  // Note Generation Options State
+  const [noteStyle, setNoteStyle] = useState('handwritten'); // 'handwritten' | 'standard'
+  const [depth, setDepth] = useState('detailed'); // 'detailed' | 'concise'
+  const [includeDefinitions, setIncludeDefinitions] = useState(true);
+  const [includeFormulas, setIncludeFormulas] = useState(true);
+  const [includeDiagrams, setIncludeDiagrams] = useState(true);
 
-  const handleSubmit = (e)   => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!inputUrl.trim()) return;
-    generateFromUrl(inputUrl);
+    
+    generateFromUrl(inputUrl, {
+      noteStyle,
+      depth,
+      includeDefinitions,
+      includeFormulas,
+      includeDiagrams
+    });
   };
 
   const handleUseExample = (example) => {
     setInputUrl(example.url);
-    generateFromUrl(example.url);
+    generateFromUrl(example.url, {
+      noteStyle,
+      depth,
+      includeDefinitions,
+      includeFormulas,
+      includeDiagrams
+    });
   };
 
   return (
@@ -23,7 +43,7 @@ export default function UrlGenerator() {
       {/* Hero Header */}
       <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
         <div className="badge badge-primary" style={{ padding: '6px 14px', fontSize: '0.82rem' }}>
-          ⚡ Next-Gen AI Transcriber & Visualizer
+          ⚡ Next-Gen AI YouTube-to-Handwritten Notes Generator
         </div>
         <h1
           style={{
@@ -34,68 +54,207 @@ export default function UrlGenerator() {
             lineHeight: 1.2
           }}
         >
-          Transform Any YouTube Video & Web URL <br />
-          Into <span style={{ background: 'linear-gradient(120deg, #6366f1, #06b6d4, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Structured Notes, Mindmaps & Flowcharts</span>
+          Transform Any YouTube Video <br />
+          Into <span style={{ background: 'linear-gradient(120deg, #6366f1, #06b6d4, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Realistic Handwritten Notebook Pages & Study Materials</span>
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '640px' }}>
-          Paste a link below or choose from our preloaded examples to generate comprehensive summaries, actionable checklists, and interactive diagrams in seconds.
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '680px' }}>
+          Paste a YouTube URL below to extract the exact transcript and generate beautiful, multipage student notebook pages with highlights, definitions, formulas, and diagrams.
         </p>
       </div>
 
-      {/* URL Input Form */}
-      <form
-        onSubmit={handleSubmit}
+      {/* Main Generation Options & Input Box */}
+      <div
         style={{
-          background: 'var(--bg-surface-elevated)',
+          background: 'var(--bg-glass-card)',
           border: '1px solid var(--border-medium)',
           borderRadius: 'var(--radius-xl)',
-          padding: '8px 10px 8px 20px',
+          padding: '24px',
           display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          boxShadow: 'var(--shadow-md)',
-          position: 'relative'
+          flexDirection: 'column',
+          gap: '20px',
+          boxShadow: 'var(--shadow-md)'
         }}
       >
-        <span style={{ fontSize: '1.2rem', color: 'var(--brand-primary)' }}>🔗</span>
-        <input
-          type="url"
-          value={inputUrl}
-          onChange={(e) => setInputUrl(e.target.value)}
-          placeholder="Paste YouTube link (https://youtube.com/watch?v=...) or Web URL..."
-          disabled={isGenerating}
+        {/* Style Selector Tabs */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <label style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+            Select Output Note Style:
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div
+              onClick={() => setNoteStyle('handwritten')}
+              style={{
+                background: noteStyle === 'handwritten' ? 'rgba(99, 102, 241, 0.15)' : 'var(--bg-surface)',
+                border: noteStyle === 'handwritten' ? '2px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '14px 18px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span style={{ fontSize: '1.8rem' }}>✍️</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                  Handwritten Notebook Style
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  Realistic ruled paper, handwriting typography, soft color highlights, definitions & diagrams
+                </div>
+              </div>
+            </div>
+
+            <div
+              onClick={() => setNoteStyle('standard')}
+              style={{
+                background: noteStyle === 'standard' ? 'rgba(99, 102, 241, 0.15)' : 'var(--bg-surface)',
+                border: noteStyle === 'standard' ? '2px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '14px 18px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span style={{ fontSize: '1.8rem' }}>📄</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                  Standard Markdown Notes
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                  Clean dashboard document view with flashcards, interactive mindmaps & flowcharts
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Granular Handwritten Customization Options */}
+        {noteStyle === 'handwritten' && (
+          <div
+            style={{
+              background: 'var(--bg-surface-elevated)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-primary)' }}>Notebook Depth:</span>
+                <button
+                  type="button"
+                  onClick={() => setDepth('detailed')}
+                  className={depth === 'detailed' ? 'badge badge-primary' : 'badge'}
+                  style={{ cursor: 'pointer', border: 'none' }}
+                >
+                  Comprehensive & Detailed
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDepth('concise')}
+                  className={depth === 'concise' ? 'badge badge-primary' : 'badge'}
+                  style={{ cursor: 'pointer', border: 'none' }}
+                >
+                  Concise Highlights
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.84rem' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={includeDefinitions}
+                    onChange={(e) => setIncludeDefinitions(e.target.checked)}
+                    style={{ accentColor: 'var(--brand-primary)' }}
+                  />
+                  <span>Highlight Definitions</span>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={includeFormulas}
+                    onChange={(e) => setIncludeFormulas(e.target.checked)}
+                    style={{ accentColor: 'var(--brand-primary)' }}
+                  />
+                  <span>Formulas & Examples</span>
+                </label>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={includeDiagrams}
+                    onChange={(e) => setIncludeDiagrams(e.target.checked)}
+                    style={{ accentColor: 'var(--brand-primary)' }}
+                  />
+                  <span>Flow Diagrams</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* URL Input Form */}
+        <form
+          onSubmit={handleSubmit}
           style={{
-            flex: 1,
-            height: '46px',
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: 'var(--text-primary)',
-            fontSize: '1rem',
-            fontFamily: 'inherit'
-          }}
-        />
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={isGenerating}
-          style={{
-            height: '46px',
-            padding: '0 24px',
-            opacity: isGenerating ? 0.7 : 1,
-            cursor: isGenerating ? 'wait' : 'pointer'
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-medium)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '6px 8px 6px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
           }}
         >
-          {isGenerating ? (
-            <span>Processing... ⏳</span>
-          ) : (
-            <>
-              <span>⚡</span>
-              <span>Generate Notes</span>
-            </>
-          )}
-        </button>
-      </form>
+          <span style={{ fontSize: '1.2rem', color: 'var(--brand-primary)' }}>▶</span>
+          <input
+            type="url"
+            value={inputUrl}
+            onChange={(e) => setInputUrl(e.target.value)}
+            placeholder="Paste YouTube Video Link (e.g. https://www.youtube.com/watch?v=...)"
+            disabled={isGenerating}
+            style={{
+              flex: 1,
+              height: '46px',
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: 'var(--text-primary)',
+              fontSize: '1rem',
+              fontFamily: 'inherit'
+            }}
+          />
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={isGenerating}
+            style={{
+              height: '46px',
+              padding: '0 24px',
+              opacity: isGenerating ? 0.7 : 1,
+              cursor: isGenerating ? 'wait' : 'pointer'
+            }}
+          >
+            {isGenerating ? (
+              <span>Generating Notes... ⏳</span>
+            ) : (
+              <>
+                <span>⚡</span>
+                <span>Generate {noteStyle === 'handwritten' ? 'Handwritten Notebook' : 'Standard Notes'}</span>
+              </>
+            )}
+          </button>
+        </form>
+      </div>
 
       {/* Animated Generation Status */}
       {isGenerating && (
@@ -116,14 +275,14 @@ export default function UrlGenerator() {
             <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem' }}>
               {generationProgress.text || 'Processing link...'}
             </span>
-            <span className="badge badge-primary">Step {generationProgress.step} of 3</span>
+            <span className="badge badge-primary">Step {generationProgress.step || 1} of 6</span>
           </div>
           <div style={{ width: '100%', height: '6px', background: 'var(--bg-surface-elevated)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
             <div
               style={{
                 height: '100%',
-                width: `${(generationProgress.step / 3) * 100}%`,
-                background: 'linear-gradient(90deg, #6366f1, #06b6d4)',
+                width: `${((generationProgress.step || 1) / 6) * 100}%`,
+                background: 'linear-gradient(90deg, #6366f1, #06b6d4, #10b981)',
                 borderRadius: 'var(--radius-full)',
                 transition: 'width 0.4s ease'
               }}

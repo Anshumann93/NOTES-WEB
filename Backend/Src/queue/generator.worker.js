@@ -6,11 +6,11 @@ const Note = require('../models/note.model');
 const generatorWorker = new Worker(
   'generatorQueue',
   async (job) => {
-    const { noteId, url, userId } = job.data;
+    const { noteId, url, userId, options } = job.data;
     console.log(`[Worker] Starting job ${job.id} for Note ${noteId}`);
     
     // Process the generation pipeline
-    await generatorService.executeGenerationJob(noteId, url, userId);
+    await generatorService.executeGenerationJob(noteId, url, userId, options);
   },
   { connection }
 );

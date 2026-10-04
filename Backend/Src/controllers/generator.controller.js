@@ -11,7 +11,7 @@ const generateFromUrl = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'URL is required');
   }
 
-  const note = await generatorService.createPendingNoteAndEnqueue(url, userId);
+  const note = await generatorService.createPendingNoteAndEnqueue(url, userId, options || {});
 
   return res.status(202).json(
     new ApiResponse(202, note, 'Job accepted and added to processing queue')

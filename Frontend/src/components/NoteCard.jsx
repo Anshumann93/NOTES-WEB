@@ -18,8 +18,12 @@ export default function NoteCard({ note, index }) {
     <div
       className={`stagger-${(index % 6) + 1}`}
       onClick={() => {
-        setEditingNote(note);
-        setIsModalOpen(true);
+        if (note.noteStyle === 'handwritten' || note.handwrittenData) {
+          setActiveNoteForViewer(note);
+        } else {
+          setEditingNote(note);
+          setIsModalOpen(true);
+        }
       }}
       style={{
         background: 'var(--bg-glass-card)',
@@ -160,6 +164,20 @@ export default function NoteCard({ note, index }) {
         </span>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {(note.handwrittenData || note.noteStyle === 'handwritten') && (
+            <button
+              className="btn-primary"
+              title="Open Handwritten Notebook"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveNoteForViewer(note);
+              }}
+              style={{ fontSize: '0.76rem', padding: '4px 8px', height: '28px', background: 'linear-gradient(135deg, #d97706, #b45309)' }}
+            >
+              ✍️ Notebook
+            </button>
+          )}
+
           {note.mindmapData && (
             <button
               className="btn-ghost"
