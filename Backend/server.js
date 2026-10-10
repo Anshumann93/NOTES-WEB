@@ -1,9 +1,6 @@
 require('dotenv').config();
-const connectDB = require('./src/config/db');
-const app = require('./src/app');
-
-// Initialize BullMQ Workers
-require('./src/queue/generator.worker');
+const connectDB = require('./Src/config/db');
+const app = require('./Src/app');
 
 connectDB()
   .then(() => {

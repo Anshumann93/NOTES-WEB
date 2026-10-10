@@ -210,7 +210,7 @@ export default function Dashboard() {
                     className="btn-secondary"
                     onClick={() => {
                       setActiveNoteForViewer(note);
-                      setActiveTab('notes');
+                      setActiveTab('noteviewer');
                     }}
                     style={{ height: '32px', padding: '0 10px', fontSize: '0.78rem' }}
                   >

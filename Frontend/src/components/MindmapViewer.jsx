@@ -1,13 +1,68 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNotes } from '../context/NotesContext';
-import { STARTER_NOTES } from '../data/starterData';
 
 export default function MindmapViewer() {
   const { activeNoteForViewer, showToast } = useNotes();
-  
-  // Default to active note's mindmapData or the starter architecture mindmap
-  const initialMindmap = activeNoteForViewer?.mindmapData || STARTER_NOTES[0].mindmapData;
-  const [mindmapData, setMindmapData] = useState(initialMindmap);
+
+  const normalizeMindmap = (data) => {
+    if (!data) return null;
+    if (!Array.isArray(data.nodes)) return data.id ? data : null;
+
+    const nodes = data.nodes.map((node, index) => ({
+      ...node,
+      id: String(node.id ?? index),
+      title: node.title || node.label || node.name || `Concept ${index + 1}`,
+      children: []
+    }));
+    if (!nodes.length) return null;
+    const byId = new Map(nodes.map(node => [node.id, node]));
+    const childIds = new Set();
+    (data.edges || data.connections || []).forEach(edge => {
+      const parent = byId.get(String(edge.source ?? edge.from));
+      const child = byId.get(String(edge.target ?? edge.to));
+      if (parent && child && parent !== child && !parent.children.includes(child)) {
+        parent.children.push(child);
+        childIds.add(child.id);
+      }
+    });
+    const roots = nodes.filter(node => !childIds.has(node.id));
+    const root = roots[0] || nodes[0];
+    if (!root) return null;
+    roots.slice(1).forEach(node => root.children.push(node));
+    root.graphEdges = (data.edges || data.connections || []).map(edge => ({
+      source: String(edge.source ?? edge.from),
+      target: String(edge.target ?? edge.to)
+    }));
+
+    const layoutVisited = new Set();
+    let leafIndex = 0;
+    const place = (node, depth = 0) => {
+      if (layoutVisited.has(node.id)) return node.y ?? 60;
+      layoutVisited.add(node.id);
+      if (node.children.length === 0) {
+        node.x = node.x ?? 80 + depth * 220;
+        node.y = node.y ?? 60 + leafIndex++ * 90;
+        return node.y;
+      }
+      const childYs = node.children.map(child => place(child, depth + 1));
+      node.x = node.x ?? 60 + depth * 220;
+      node.y = node.y ?? (childYs[0] + childYs[childYs.length - 1]) / 2;
+      return node.y;
+    };
+    place(root);
+    root.expanded = root.expanded ?? true;
+    return root;
+  };
+
+  const [mindmapData, setMindmapData] = useState(() => {
+    const raw = activeNoteForViewer?.mindmapData || activeNoteForViewer?.mindMap || null;
+    return normalizeMindmap(raw);
+  });
+  useEffect(() => {
+    const raw = activeNoteForViewer?.mindmapData || activeNoteForViewer?.mindMap || null;
+    setMindmapData(normalizeMindmap(raw));
+    setSelectedNode(null);
+  }, [activeNoteForViewer]);
   
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 60, y: 40 });
@@ -85,7 +140,10 @@ export default function MindmapViewer() {
   const nodes = [];
   const lines = [];
 
+  const visitedNodes = new Set();
   const traverse = (node, parent = null) => {
+    if (!node || visitedNodes.has(node.id)) return;
+    visitedNodes.add(node.id);
     nodes.push({ node, parent });
     if (parent) {
       lines.push({ from: parent, to: node });
@@ -94,7 +152,13 @@ export default function MindmapViewer() {
       node.children.forEach(child => traverse(child, node));
     }
   };
-  traverse(mindmapData);
+  if (mindmapData) traverse(mindmapData);
+  if (mindmapData?.graphEdges?.length) {
+    const visibleById = new Map(nodes.map(({ node }) => [node.id, node]));
+    lines.splice(0, lines.length, ...mindmapData.graphEdges
+      .map(edge => ({ from: visibleById.get(edge.source), to: visibleById.get(edge.target) }))
+      .filter(link => link.from && link.to));
+  }
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -106,7 +170,7 @@ export default function MindmapViewer() {
             🧠 Interactive Mindmap Studio
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            Visual hierarchy generated from: <strong>{activeNoteForViewer?.title || 'System Architecture Talk'}</strong>
+            Visual hierarchy generated from: <strong>{activeNoteForViewer?.title || 'Select a note with a mindmap'}</strong>
           </p>
         </div>
 
@@ -118,7 +182,10 @@ export default function MindmapViewer() {
         </div>
       </div>
 
+      {!mindmapData ? <div style={{ padding: 32, color: 'var(--text-secondary)' }}>Open a generated note with mindmap data from Notes to visualize its concepts.</div> : null}
+
       {/* SVG & Node Canvas Container */}
+      {mindmapData && <>
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
@@ -252,6 +319,7 @@ export default function MindmapViewer() {
           })}
         </div>
       </div>
+      </>}
     </div>
   );
 }

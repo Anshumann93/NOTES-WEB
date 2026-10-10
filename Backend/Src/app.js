@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const mongoSanitizePkg = require('express-mongo-sanitize');
 const { sanitize: sanitizeMongoPayload } = mongoSanitizePkg;
 const rateLimit = require('express-rate-limit');
-const ApiError = require('./utils/ApiError');
+const ApiError = require('./utils/ApiError.js');
 
 const app = express();
 

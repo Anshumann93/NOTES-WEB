@@ -37,7 +37,9 @@ export function NotesProvider({ children }) {
     setLoading(true);
     try {
       const data = await NotesService.getNotes();
-      setNotes(data.notes || []);
+      // Normalize _id -> id for all notes
+      const normalized = (data.notes || []).map(n => ({ ...n, id: n._id?.toString() || n.id }));
+      setNotes(normalized);
     } catch (err) {
       console.error('Failed to load notes', err);
     } finally {
@@ -58,7 +60,8 @@ export function NotesProvider({ children }) {
       let stateChanged = false;
       for (const pNote of processingNotes) {
         try {
-          const statusResult = await NotesService.getNoteStatus(pNote.id);
+          const noteId = pNote._id?.toString() || pNote.id;
+          const statusResult = await NotesService.getNoteStatus(noteId);
           if (statusResult.status === 'completed' || statusResult.status === 'failed') {
             stateChanged = true;
             if (statusResult.status === 'completed') {
@@ -123,41 +126,24 @@ export function NotesProvider({ children }) {
     }
 
     setIsGenerating(true);
-    setGenerationProgress({ step: 1, text: 'Validating YouTube URL & transcript...' });
+    setGenerationProgress({ step: 1, text: 'Extracting transcript and generating study materials...' });
 
     try {
-      // 1. Trigger the job on backend
-      const result = await AiGeneratorService.generateFromUrl(url, options);
-      const pendingNoteId = result._id || result.id;
-      
-      // 2. Refresh notes list to show pending note card
+      const completedNote = await AiGeneratorService.generateFromUrl(url, options);
+      const normalizedNote = {
+        ...completedNote,
+        id: completedNote._id?.toString() || completedNote.id
+      };
+
       await loadNotes();
-      
-      showToast('Extracting transcript and generating notes...', 'info');
 
-      // 3. Poll for progress and completion
-      if (pendingNoteId) {
-        const completedNote = await AiGeneratorService.pollGenerationStatus(
-          pendingNoteId,
-          2000,
-          90,
-          (statusUpdate) => {
-            if (statusUpdate?.progressText) {
-              setGenerationProgress({
-                step: statusUpdate.progressStep || 2,
-                text: statusUpdate.progressText
-              });
-            }
-          }
-        );
+      showToast(`Notes generated successfully: ${normalizedNote.title}`, 'success');
+      setActiveNoteForViewer(normalizedNote);
 
-        await loadNotes();
-        showToast(`Notes generated successfully: ${completedNote.title}`, 'success');
-
-        // Automatically open handwritten notebook viewer if generated in handwritten style
-        if (completedNote.noteStyle === 'handwritten' || options.noteStyle === 'handwritten') {
-          setActiveNoteForViewer(completedNote);
-        }
+      if (normalizedNote.noteStyle === 'handwritten' || options.noteStyle === 'handwritten') {
+        setActiveTab('notes');
+      } else {
+        setActiveTab('noteviewer');
       }
     } catch (err) {
       console.error('[NotesContext] Generation error:', err);

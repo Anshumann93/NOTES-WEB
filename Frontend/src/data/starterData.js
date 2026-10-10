@@ -80,7 +80,7 @@ export const STARTER_NOTES = [
           sections: [
             { type: "heading", title: "2. Signal Pathway Flow Diagram" },
             { type: "diagram", title: "Event Processing & Dead-Letter Queue Pipeline", diagramType: "process", items: [
-              "User Request", "API Gateway", "Kafka Event Bus", "Consumer Health Check", "Postgres Write & Redis Cache"
+              "User Request", "API Gateway", "Kafka Event Bus", "Consumer Health Check", "Postgres Write & Cache Store"
             ] },
             { type: "example", title: "Fault Tolerant Fallback Logic", content: "async function executeWithFallback<T>(fn: () => Promise<T>, fallback: T): Promise<T> { try { return await fn(); } catch (err) { return fallback; } }", highlight: "green" }
           ]

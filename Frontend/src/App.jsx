@@ -11,6 +11,7 @@ import NotesGrid from './components/NotesGrid';
 import MindmapViewer from './components/MindmapViewer';
 import FlowchartViewer from './components/FlowchartViewer';
 import NoteEditorModal from './components/NoteEditorModal';
+import NoteViewer from './components/NoteViewer';
 import Toast from './components/Toast';
 import HandwrittenNotesViewer from './components/HandwrittenNotesViewer';
 import StudyShellLogo from './assets/StudyShellLogo';
@@ -27,7 +28,9 @@ function AppContent() {
     return <Auth />;
   }
 
+  // Show handwritten overlay only when viewing a handwritten note AND not on diagram/viewer tabs
   const isMindmapOrFlowchart = activeTab === 'mindmap' || activeTab === 'flowchart';
+  const isHandwrittenNote = activeNoteForViewer && (activeNoteForViewer.noteStyle === 'handwritten' || activeNoteForViewer.handwrittenData);
 
   return (
     <div className="app-layout">
@@ -40,12 +43,13 @@ function AppContent() {
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'features' && <KeyFeatures />}
         {activeTab === 'notes' && <NotesGrid />}
+        {activeTab === 'noteviewer' && <NoteViewer />}
         {activeTab === 'mindmap' && <MindmapViewer />}
         {activeTab === 'flowchart' && <FlowchartViewer />}
       </main>
 
-      {/* Handwritten Notebook Overlay Modal */}
-      {activeNoteForViewer && !isMindmapOrFlowchart && (
+      {/* Handwritten Notebook Overlay — only for handwritten notes not on diagram/viewer tabs */}
+      {activeNoteForViewer && isHandwrittenNote && !isMindmapOrFlowchart && activeTab !== 'noteviewer' && (
         <HandwrittenNotesViewer
           note={activeNoteForViewer}
           onClose={() => setActiveNoteForViewer(null)}
@@ -74,7 +78,7 @@ function AppContent() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
           <span>StudyShell Notes Generator v1.0.0</span>
           <span>•</span>
-          <span style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>🌟 Ready for Backend API Integration</span>
+          <span style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>🌟 AI-Powered Study Materials</span>
         </div>
       </footer>
     </div>

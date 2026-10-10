@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const ApiError = require('../utils/ApiError');
-const asyncHandler = require('../utils/asyncHandler');
-const User = require('../models/user.model');
+const asyncHandler = require('../utils/asyncHandler.js');
+const User = require('../models/user.model.js');
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
   try {

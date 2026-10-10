@@ -1,12 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotes } from '../context/NotesContext';
-import { STARTER_NOTES } from '../data/starterData';
 
 export default function FlowchartViewer() {
   const { activeNoteForViewer, showToast } = useNotes();
 
-  const initialFlow = activeNoteForViewer?.flowchartData || STARTER_NOTES[0].flowchartData;
-  const [flowchartData, setFlowchartData] = useState(initialFlow);
+  const normalizeFlow = (data) => {
+    if (!data) return null;
+    const rawNodes = Array.isArray(data.nodes) ? data.nodes : [];
+    if (!rawNodes.length) return null;
+    const rawConnections = data.connections || data.edges || [];
+    const nodes = rawNodes.map((node, index) => ({
+      ...node,
+      id: String(node.id ?? index),
+      step: node.step || `Step ${index + 1}`,
+      title: node.title || node.label || node.name || `Step ${index + 1}`,
+      desc: node.desc || node.description || '',
+      type: node.type || 'process'
+    }));
+    const ids = new Set(nodes.map(node => node.id));
+    const connections = rawConnections.map(edge => ({
+      ...edge,
+      from: String(edge.from ?? edge.source ?? ''),
+      to: String(edge.to ?? edge.target ?? '')
+    })).filter(edge => ids.has(edge.from) && ids.has(edge.to));
+
+    // Place graph data in columns by dependency depth; retain supplied positions.
+    const depthById = new Map();
+    const getDepth = (id, visiting = new Set()) => {
+      if (depthById.has(id)) return depthById.get(id);
+      if (visiting.has(id)) return 0;
+      visiting.add(id);
+      const parents = connections.filter(edge => edge.to === id);
+      const depth = parents.length ? Math.max(...parents.map(edge => getDepth(edge.from, visiting) + 1)) : 0;
+      visiting.delete(id);
+      depthById.set(id, depth);
+      return depth;
+    };
+    const rowsByDepth = new Map();
+    nodes.forEach(node => {
+      const depth = getDepth(node.id);
+      const row = rowsByDepth.get(depth) || 0;
+      rowsByDepth.set(depth, row + 1);
+      node.x = Number.isFinite(Number(node.x)) ? Number(node.x) : 70 + depth * 270;
+      node.y = Number.isFinite(Number(node.y)) ? Number(node.y) : 70 + row * 145;
+    });
+    return { ...data, title: data.title || 'Generated Flow Diagram', nodes, connections };
+  };
+  const [flowchartData, setFlowchartData] = useState(() => {
+    const raw = activeNoteForViewer?.flowchartData || activeNoteForViewer?.flowchart || null;
+    return normalizeFlow(raw);
+  });
+  useEffect(() => {
+    const raw = activeNoteForViewer?.flowchartData || activeNoteForViewer?.flowchart || null;
+    setFlowchartData(normalizeFlow(raw));
+    setActiveStepIndex(-1);
+  }, [activeNoteForViewer]);
   const [activeStepIndex, setActiveStepIndex] = useState(-1);
   const [isSimulating, setIsSimulating] = useState(false);
 
@@ -15,7 +63,7 @@ export default function FlowchartViewer() {
     setIsSimulating(true);
     showToast('Starting Workflow Simulation...', 'info');
 
-    const steps = [0, 1, 2, 4, 5];
+    const steps = flowchartData.nodes.map((_, index) => index);
     for (let idx of steps) {
       setActiveStepIndex(idx);
       const node = flowchartData.nodes[idx];
@@ -36,6 +84,7 @@ export default function FlowchartViewer() {
     const title = prompt('Enter Step Title:', 'Security Verification');
     if (!title || !title.trim()) return;
 
+    if (!flowchartData) return;
     const lastNode = flowchartData.nodes[flowchartData.nodes.length - 1];
     const newNode = {
       id: `fn-${Date.now()}`,
@@ -50,7 +99,7 @@ export default function FlowchartViewer() {
     setFlowchartData(prev => ({
       ...prev,
       nodes: [...prev.nodes, newNode],
-      connections: [...prev.connections, { from: lastNode.id, to: newNode.id, label: 'Next' }]
+      connections: [...prev.connections, ...(lastNode ? [{ from: lastNode.id, to: newNode.id, label: 'Next' }] : [])]
     }));
     showToast(`Added ${newNode.step}`, 'success');
   };
@@ -65,7 +114,7 @@ export default function FlowchartViewer() {
             🔀 Workflow Flowchart Studio
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
-            Interactive process flow: <strong>{flowchartData.title}</strong>
+            Interactive process flow: <strong>{flowchartData?.title || activeNoteForViewer?.title || 'Select a note with a flow diagram'}</strong>
           </p>
         </div>
 
@@ -83,6 +132,7 @@ export default function FlowchartViewer() {
         </div>
       </div>
 
+      {!flowchartData ? <div style={{ padding: 32, color: 'var(--text-secondary)' }}>Open a generated note with flowchart data from Notes to visualize its steps.</div> : <>
       {/* Canvas Viewport */}
       <div
         style={{
@@ -213,6 +263,7 @@ export default function FlowchartViewer() {
           );
         })}
       </div>
+      </>}
     </div>
   );
 }

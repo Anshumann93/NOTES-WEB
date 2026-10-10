@@ -10,20 +10,21 @@ export const NotesService = {
   },
 
   async saveNote(note) {
-    if (note.id || note._id) {
-      // Actually backend didn't implement PUT yet, wait. I implemented POST for creation but no PUT?
-      // Wait, let me check note.routes.js in Backend. I didn't add a PUT route! Let me add it.
-      // But the frontend can just send a POST to create? Wait, the user can edit notes. 
-      // The frontend uses NotesService.saveNote for both.
-      // I will just use POST /notes for creation and I'll need to create a PUT route on backend or assume POST handles it. 
-      // Wait, let's fix the frontend to use POST for creation, and I'll skip actual update for now if it doesn't exist on backend. 
-      // Wait, we can implement update on backend if needed, but let's just do creation and deletion for now.
+    const noteId = note.id || note._id;
+    if (noteId) {
+      // Update existing note via PUT
+      const updated = await apiRequest(`/notes/${noteId}`, {
+        method: 'PUT',
+        body: JSON.stringify(note)
+      });
+      return { ...updated, id: updated._id || updated.id };
     }
+    // Create new note via POST
     const created = await apiRequest('/notes', {
       method: 'POST',
       body: JSON.stringify(note)
     });
-    return created;
+    return { ...created, id: created._id || created.id };
   },
 
   async deleteNote(noteId, permanent = false) {
@@ -41,6 +42,7 @@ export const NotesService = {
   },
 
   async getNoteStatus(noteId) {
-    return await apiRequest(`/notes/${noteId}/status`);
+    const result = await apiRequest(`/notes/${noteId}/status`);
+    return result;
   }
 };

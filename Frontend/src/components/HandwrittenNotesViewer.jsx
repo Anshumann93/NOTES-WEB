@@ -16,7 +16,7 @@ export default function HandwrittenNotesViewer({ note, onClose }) {
 
   // Normalize handwritten data
   let pages = [];
-  if (note.handwrittenData && Array.isArray(note.handwrittenData.pages)) {
+  if (note.handwrittenData && Array.isArray(note.handwrittenData.pages) && note.handwrittenData.pages.length > 0) {
     pages = note.handwrittenData.pages;
   } else {
     // Convert standard markdown content into structured pages
@@ -24,15 +24,28 @@ export default function HandwrittenNotesViewer({ note, onClose }) {
     const lines = rawContent.split('\n');
     let page1Sections = [];
 
+    let codeLines = null;
     lines.forEach(line => {
-      if (line.startsWith('## ') || line.startsWith('### ')) {
-        page1Sections.push({ type: 'heading', title: line.replace(/^#{2,3}\s?/, '') });
+      if (line.trim().startsWith('```')) {
+        if (codeLines) {
+          if (codeLines.length) page1Sections.push({ type: 'code', content: codeLines.join('\n') });
+          codeLines = null;
+        } else {
+          codeLines = [];
+        }
+      } else if (codeLines) {
+        codeLines.push(line);
+      } else if (/^#{1,6}\s/.test(line)) {
+        page1Sections.push({ type: 'heading', title: line.replace(/^#{1,6}\s?/, '') });
       } else if (line.startsWith('- ') || line.startsWith('* ')) {
-        page1Sections.push({ type: 'bullets', items: [line.replace(/^[-*]\s?/, '')] });
+        const previous = page1Sections[page1Sections.length - 1];
+        if (previous?.type === 'bullets') previous.items.push(line.replace(/^[-*]\s?/, ''));
+        else page1Sections.push({ type: 'bullets', items: [line.replace(/^[-*]\s?/, '')] });
       } else if (line.trim().length > 0) {
         page1Sections.push({ type: 'paragraph', content: line.trim() });
       }
     });
+    if (codeLines?.length) page1Sections.push({ type: 'code', content: codeLines.join('\n') });
 
     pages = [
       {
@@ -78,16 +91,20 @@ export default function HandwrittenNotesViewer({ note, onClose }) {
           backgroundColor: '#faf6ee'
         });
 
+        if (!canvas.width || !canvas.height) {
+          throw new Error(`Page ${i + 1} rendered with no content`);
+        }
+
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
         if (i > 0) {
           pdf.addPage();
         }
 
-        const imgWidth = pdfWidth;
-        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, Math.min(imgHeight, pdfHeight));
+        const fit = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+        const imgWidth = canvas.width * fit;
+        const imgHeight = canvas.height * fit;
+        pdf.addImage(imgData, 'JPEG', (pdfWidth - imgWidth) / 2, 0, imgWidth, imgHeight);
       }
 
       const safeTitle = (note.title || 'Handwritten_Notes').replace(/[^a-z0-9]/gi, '_');
@@ -132,13 +149,15 @@ export default function HandwrittenNotesViewer({ note, onClose }) {
       <div
         ref={printContainerRef}
         style={{
-          position: 'absolute',
-          left: '-9999px',
-          top: '-9999px',
+          position: 'fixed',
+          left: 0,
+          top: 0,
           width: '800px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '0px'
+          gap: '0px',
+          pointerEvents: 'none',
+          zIndex: 1300
         }}
       >
         {pages.map((pData, idx) => (

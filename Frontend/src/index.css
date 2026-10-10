@@ -176,6 +176,11 @@
   }
 }
 
+@keyframes generationProgress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(190%); }
+}
+
 .stagger-1 { animation: cardDescentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.04s backwards; }
 .stagger-2 { animation: cardDescentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards; }
 .stagger-3 { animation: cardDescentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.12s backwards; }

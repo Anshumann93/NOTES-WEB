@@ -5,7 +5,7 @@ export default function UrlBookmarkCard({ note, index }) {
   const { deleteNote, setEditingNote, setIsModalOpen, setActiveNoteForViewer, setActiveTab, showToast } = useNotes();
 
   const copyUrl = () => {
-    navigator.clipboard.writeText(note.url);
+    navigator.clipboard.writeText(note.url || note.youtubeUrl || '');
     showToast('📋 Copied URL to clipboard!', 'success');
   };
 
@@ -13,8 +13,18 @@ export default function UrlBookmarkCard({ note, index }) {
     <div
       className={`stagger-${(index % 6) + 1}`}
       onClick={() => {
-        setEditingNote(note);
-        setIsModalOpen(true);
+        if (note.noteStyle === 'handwritten' || note.handwrittenData) {
+          // Handwritten notes -> open overlay
+          setActiveNoteForViewer(note);
+        } else if (note.notes || note.sourceType === 'youtube' || note.summary) {
+          // AI-generated notes -> open NoteViewer tab
+          setActiveNoteForViewer(note);
+          setActiveTab('noteviewer');
+        } else {
+          // Plain bookmark -> edit modal
+          setEditingNote(note);
+          setIsModalOpen(true);
+        }
       }}
       style={{
         background: 'var(--bg-glass-card)',
@@ -33,7 +43,7 @@ export default function UrlBookmarkCard({ note, index }) {
       <div
         style={{
           height: '140px',
-          backgroundImage: `url(${note.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80'})`,
+          backgroundImage: `url(${note.image || note.thumbnail || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80'})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
@@ -67,7 +77,7 @@ export default function UrlBookmarkCard({ note, index }) {
             border: '1px solid rgba(255, 255, 255, 0.15)'
           }}
         >
-          <span>🌐</span>
+          <span>{note.sourceType === 'youtube' ? '▶' : '🌐'}</span>
           <span>{note.domain || 'web'}</span>
         </div>
       </div>
@@ -89,7 +99,7 @@ export default function UrlBookmarkCard({ note, index }) {
             overflow: 'hidden'
           }}
         >
-          {note.content?.slice(0, 180)}
+          {note.summary || note.content?.slice(0, 180)}
         </p>
 
         {note.tags && note.tags.length > 0 && (
@@ -114,7 +124,7 @@ export default function UrlBookmarkCard({ note, index }) {
           }}
         >
           <a
-            href={note.url}
+            href={note.url || note.youtubeUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
@@ -127,11 +137,41 @@ export default function UrlBookmarkCard({ note, index }) {
               gap: '4px'
             }}
           >
-            Visit Link ↗
+            {note.sourceType === 'youtube' ? 'Watch Video' : 'Visit Link'} ↗
           </a>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            {note.mindmapData && (
+            {/* AI Notes button for non-handwritten AI-generated notes */}
+            {(note.notes || note.summary) && !(note.handwrittenData || note.noteStyle === 'handwritten') && (
+              <button
+                className="btn-primary"
+                title="Open AI generated notes"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveNoteForViewer(note);
+                  setActiveTab('noteviewer');
+                }}
+                style={{ fontSize: '0.76rem', padding: '4px 8px', height: '28px' }}
+              >
+                📝 Notes
+              </button>
+            )}
+            {/* Handwritten notebook button */}
+            {(note.handwrittenData || note.noteStyle === 'handwritten') && (
+              <button
+                className="btn-primary"
+                title="Open handwritten notebook"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveNoteForViewer(note);
+                }}
+                style={{ fontSize: '0.76rem', padding: '4px 8px', height: '28px', background: 'linear-gradient(135deg, #d97706, #b45309)' }}
+              >
+                ✍️ Notebook
+              </button>
+            )}
+            {/* Mindmap button */}
+            {(note.mindmapData || note.mindMap) && (
               <button
                 className="btn-ghost"
                 title="Mindmap"
@@ -143,6 +183,22 @@ export default function UrlBookmarkCard({ note, index }) {
                 style={{ fontSize: '0.8rem', padding: '4px 6px' }}
               >
                 🧠
+              </button>
+            )}
+
+            {/* Flowchart button */}
+            {(note.flowchartData || note.flowchart) && (
+              <button
+                className="btn-ghost"
+                title="Open Flow Diagram"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveNoteForViewer(note);
+                  setActiveTab('flowchart');
+                }}
+                style={{ fontSize: '0.8rem', padding: '4px 6px' }}
+              >
+                🔀
               </button>
             )}
 

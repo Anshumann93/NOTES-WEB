@@ -100,7 +100,7 @@ export default function HandwrittenNotePage({ pageData, totalPages, paperStyle =
         if (type === 'code') {
           return (
             <div key={idx} className="handwritten-code">
-              {section.content}
+              <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', margin: 0 }}>{section.content}</pre>
             </div>
           );
         }

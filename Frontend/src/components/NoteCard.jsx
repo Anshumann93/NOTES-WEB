@@ -18,9 +18,15 @@ export default function NoteCard({ note, index }) {
     <div
       className={`stagger-${(index % 6) + 1}`}
       onClick={() => {
+        // Handwritten notes -> open HandwrittenNotesViewer overlay
         if (note.noteStyle === 'handwritten' || note.handwrittenData) {
           setActiveNoteForViewer(note);
+        // AI-generated standard notes -> open NoteViewer tab
+        } else if (note.notes || note.sourceType === 'youtube') {
+          setActiveNoteForViewer(note);
+          setActiveTab('noteviewer');
         } else {
+          // Plain manual notes -> open edit modal
           setEditingNote(note);
           setIsModalOpen(true);
         }
@@ -178,7 +184,7 @@ export default function NoteCard({ note, index }) {
             </button>
           )}
 
-          {note.mindmapData && (
+          {(note.mindmapData || note.mindMap) && (
             <button
               className="btn-ghost"
               title="Open Mindmap"
@@ -193,7 +199,7 @@ export default function NoteCard({ note, index }) {
             </button>
           )}
 
-          {note.flowchartData && (
+          {(note.flowchartData || note.flowchart) && (
             <button
               className="btn-ghost"
               title="Open Flowchart"

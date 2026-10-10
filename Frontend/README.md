@@ -25,11 +25,11 @@ All backend communication is modularized inside `src/services/` so you can conne
 
 ### 1. `src/services/api.js` (Base API Client)
 - **Base URL Configuration**: Configured via `VITE_API_BASE_URL` in `.env` (defaults to `http://localhost:5000/api`).
-- **Auth Tokens**: Automatically attaches `Bearer <token>` headers from `localStorage`.
-- **Intelligent Fallback**: Gracefully falls back to client mock simulation if the backend is offline during development.
+- **Authentication**: Sends HTTP-only access cookies with `credentials: 'include'`.
+- **Errors and timeouts**: Reports API failures directly; generation requests allow up to five minutes.
 
 ### 2. `src/services/aiGeneratorService.js` (AI URL & Video Generator)
-- `POST /api/generate/url` -> Receives `{ url, options }` and returns structured note summaries, key takeaways, task checklists, mindmap hierarchy, and flowchart diagrams.
+- `POST /api/notes/generate` -> Receives `{ url, options }`, performs transcript extraction and AI generation, and returns the saved note.
 
 ### 3. `src/services/notesService.js` (Notes & Dashboard Persistence)
 - `GET /api/notes` -> Fetch user notes

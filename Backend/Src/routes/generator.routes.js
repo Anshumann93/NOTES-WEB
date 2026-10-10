@@ -1,6 +1,6 @@
 const { Router } = require('express');
-const { generateFromUrl } = require('../controllers/generator.controller');
-const { verifyJWT } = require('../middlewares/auth.middleware');
+const { generateFromUrl } = require('../controllers/generator.controller.js');
+const { verifyJWT } = require('../middlewares/auth.middleware.js');
 
 const router = Router();
 

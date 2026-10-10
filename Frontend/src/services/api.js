@@ -1,10 +1,15 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
-  TIMEOUT_MS: 30000,
+  TIMEOUT_MS: 120000,
   USE_MOCK_FALLBACK: false
 };
 
 export async function apiRequest(endpoint, options = {}) {
+  const {
+    timeoutMs = API_CONFIG.TIMEOUT_MS,
+    timeoutMessage,
+    ...requestOptions
+  } = options;
   const url = `${API_CONFIG.BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   
   const headers = {
@@ -14,18 +19,17 @@ export async function apiRequest(endpoint, options = {}) {
   };
 
   const config = {
-    ...options,
+    ...requestOptions,
     headers,
     credentials: 'include' // Crucial for HTTP-only cookies (refresh token)
   };
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT_MS);
-    config.signal = controller.signal;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  config.signal = controller.signal;
 
+  try {
     const response = await fetch(url, config);
-    clearTimeout(timeoutId);
 
     const data = await response.json().catch(() => null);
 
@@ -37,6 +41,11 @@ export async function apiRequest(endpoint, options = {}) {
     // Backend standardized on { success, data, message }
     return data?.data !== undefined ? data.data : data;
   } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error(timeoutMessage || `Request timed out after ${Math.ceil(timeoutMs / 1000)} seconds.`);
+    }
     throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }

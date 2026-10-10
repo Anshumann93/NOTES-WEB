@@ -275,16 +275,15 @@ export default function UrlGenerator() {
             <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem' }}>
               {generationProgress.text || 'Processing link...'}
             </span>
-            <span className="badge badge-primary">Step {generationProgress.step || 1} of 6</span>
           </div>
           <div style={{ width: '100%', height: '6px', background: 'var(--bg-surface-elevated)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
             <div
               style={{
                 height: '100%',
-                width: `${((generationProgress.step || 1) / 6) * 100}%`,
+                width: '35%',
                 background: 'linear-gradient(90deg, #6366f1, #06b6d4, #10b981)',
                 borderRadius: 'var(--radius-full)',
-                transition: 'width 0.4s ease'
+                animation: 'generationProgress 1.4s ease-in-out infinite alternate'
               }}
             />
           </div>

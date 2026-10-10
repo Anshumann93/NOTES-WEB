@@ -2,7 +2,7 @@ const Note = require('../models/note.model');
 const ApiError = require('../utils/ApiError');
 
 class NoteService {
-  async getAllNotes(userId, { page = 1, limit = 10, category, isTrash, sort = '-createdAt' }) {
+  async getAllNotes(userId, { page = 1, limit = 50, category, isTrash, sort = '-createdAt' }) {
     const query = { user: userId };
     
     if (category) query.category = category;

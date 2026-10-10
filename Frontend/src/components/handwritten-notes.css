@@ -100,7 +100,8 @@
   font-family: 'Kalam', 'Caveat', 'Patrick Hand', cursive;
   font-size: 1.15rem;
   line-height: 28px; /* Matches line height of ruling */
-  overflow: hidden;
+  overflow: visible;
+  flex: 0 0 auto;
   box-sizing: border-box;
   transition: transform 0.3s ease;
 }
@@ -289,9 +290,9 @@
 
 /* Page Footer */
 .handwritten-footer {
-  position: absolute;
-  bottom: 16px;
-  right: 40px;
+  position: relative;
+  margin-top: 20px;
+  text-align: right;
   font-size: 0.9rem;
   color: #64748b;
   font-weight: 600;
